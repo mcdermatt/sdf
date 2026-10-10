@@ -135,9 +135,9 @@ void GLRenderer::resize(int width, int height) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void GLRenderer::render(const CameraUniforms& cam, float time, int scene_id) {
+void GLRenderer::render(const FrameParams& params, const WorldView& world) {
     // 1. Run CUDA Raymarching Kernel on RTX 3090
-    launch_cuda_render(d_pixels_, width_, height_, cam, time, scene_id);
+    launch_cuda_render(d_pixels_, width_, height_, params, world);
 
     // 2. High-speed DMA copy to host pinned buffer
     size_t buffer_size = width_ * height_ * sizeof(uchar4);

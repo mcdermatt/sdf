@@ -1,0 +1,8 @@
+build/
+bin/
+*.o
+*.so
+sdf/
+.vscode/
+.idea/
+compile_commands.json

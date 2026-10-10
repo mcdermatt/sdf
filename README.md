@@ -1,69 +1,55 @@
-# CUDA SDF Real-Time Raymarcher
+# CUDA Destructible SDF Outdoor World
 
-A high-performance C++20 and CUDA Signed Distance Field (SDF) raymarcher running on NVIDIA RTX hardware, rendered through an OpenGL/GLFW interactive window with full orbit camera controls.
+A real-time Signed Distance Field (SDF) renderer and destructible physics sandbox running on an NVIDIA GeForce RTX 3090, featuring procedural rolling terrain, soil strata, foliage, a log cabin, physical volumetric clouds at sunset, and an interactive ray gun.
 
 ---
 
 ## Features
 
-- **Raymarching (Sphere Tracing)**: Mathematically exact, pixel-perfect rendering directly from analytical distance functions.
-- **CUDA Kernel Acceleration**: Parallel per-pixel ray evaluation evaluated across GPU streaming multiprocessors (Ampere `sm_86`).
-- **Surface Normals & Shading**:
-  - Analytical normals computed via central differences ($\nabla f(\mathbf{p})$).
-  - Blinn-Phong specular highlighting and ambient lighting.
-  - Soft raymarched shadows with penumbra estimation.
-  - Ambient occlusion along surface normal vectors.
-  - Reinhard tone mapping and gamma correction ($2.2$).
-- **Interactive Orbit Camera**:
-  - Smooth mouse drag orbit rotation (azimuth / elevation).
-  - Mouse wheel zoom.
-  - Right-click camera panning.
-- **Multiple Switchable Scenes**:
-  1. **Scene 1**: Morphing smooth CSG (Sphere + Box + Torus blend with polynomial smooth minimum).
-  2. **Scene 2**: Mechanical CSG (Cube + Sphere intersection with orthogonal cylindrical drills).
-  3. **Scene 3**: Mathematical Lattice (Triply periodic minimal surface / Gyroid bounded inside a sphere).
+- **Procedural Rolling Hills**: Multi-octave Perlin noise gradient heightfield blended into an organic landscape.
+- **Stratified Soil Layers**:
+  - **Grass**: Top layer (~1 inch thick), dynamically omitted on slopes steeper than $30^\circ$.
+  - **Dirt**: Sub-surface soil (4 to 6 inches thick), eroded away on slopes steeper than $40^\circ$.
+  - **Rock**: Bedrock underlying the dirt and exposed on steep cliffs and in blast craters.
+- **Log Cabin & Pine Forest**:
+  - Authentic interlocking log courses, gable roof, plank door, and fieldstone chimney.
+  - Multi-tier procedural pine trees surrounding the cabin clearing.
+- **Destructible Terrain via Ray Gun**:
+  - Visible first-person sci-fi ray gun on the right side of the screen with recoil and walk bobbing.
+  - Left-clicking fires a high-energy laser beam and smoothly carves out a crater directly in the analytical SDF.
+  - Craters immediately reveal the grass $\rightarrow$ dirt $\rightarrow$ rock strata along the crater walls.
+  - Real-time $128 \times 128$ spatial grid on the GPU ensures continuous 60+ FPS performance even with many carved holes.
+- **Physical Volumetric Clouds & Sunset Skybox**:
+  - Sunset sun low on the western horizon casting warm golden light and elongated soft shadows.
+  - Volumetric cloud layer raymarched with light marching toward the sun for self-shadowing and silver lining (Mie forward scattering).
+- **First-Person Controller**:
+  - Captured mouse look (un-inverted yaw & pitch).
+  - WASD surface walking with terrain collision.
+  - Left Shift sprint and Spacebar jump with gravity.
 
 ---
 
 ## Controls
 
-| Key / Mouse Action | Function |
+| Input | Action |
 | :--- | :--- |
-| **Left Click + Drag** | Orbit rotate camera |
-| **Right Click + Drag** | Pan camera target |
-| **Scroll Wheel** | Zoom in / out |
-| **Keys `1`, `2`, `3`** | Switch between SDF scenes |
-| **Spacebar** | Pause / resume animation |
-| **Key `R`** | Reset camera to default view |
-| **Esc** | Exit application |
+| **Mouse Move** | Look around (first-person camera, un-inverted) |
+| **Left Click** | Fire Ray Gun & carve craters into the SDF |
+| **W / A / S / D** | Walk along the ground |
+| **Left Shift** | Sprint |
+| **Spacebar** | Jump |
+| **R** | Respawn at the cabin clearing |
+| **Esc** | Release mouse cursor / Exit |
 
 ---
 
 ## Building & Running
 
-### Prerequisites
-
-- NVIDIA GPU with CUDA Toolkit ($\ge 12.0$)
-- C++20 compatible compiler (`g++` or `clang++`)
-- CMake ($\ge 3.22$)
-- OpenGL, GLEW, GLFW3, GLM
-
 ```bash
-# Ubuntu / WSL dependencies
-sudo apt update
-sudo apt install -y build-essential cmake libglfw3-dev libglew-dev libglm-dev libgl1-mesa-dev
-```
-
-### Build
-
-```bash
-mkdir -p build
+# Build
 cmake -B build -S .
 cmake --build build -j
-```
 
-### Run
-
-```bash
+# Run
 ./build/cuda_sdf_viewer
 ```

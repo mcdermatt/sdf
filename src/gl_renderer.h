@@ -1,7 +1,8 @@
 #pragma once
 #include <GL/glew.h>
 #include <cuda_runtime.h>
-#include "camera.h"
+#include "frame_params.h"
+#include "world_view.h"
 
 class GLRenderer {
 public:
@@ -10,7 +11,7 @@ public:
 
     bool init(int width, int height);
     void resize(int width, int height);
-    void render(const CameraUniforms& cam, float time, int scene_id);
+    void render(const FrameParams& params, const WorldView& world);
     void cleanup();
 
 private:
@@ -23,6 +24,6 @@ private:
     GLuint vbo_ = 0;
     GLuint shader_program_ = 0;
 
-    uchar4* d_pixels_ = nullptr; // CUDA device buffer on GPU
-    uchar4* h_pixels_ = nullptr; // CUDA pinned host memory for high-speed PCIe copy
+    uchar4* d_pixels_ = nullptr; // CUDA GPU device memory
+    uchar4* h_pixels_ = nullptr; // CUDA pinned host memory
 };
